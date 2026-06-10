@@ -1,4 +1,4 @@
-# CTF AI Agent (F:\ofntkd)
+# CTF AI Agent 
 
 **어떤 CTF 플랫폼이든** 쓸 수 있는 AI 풀이 도구 모음입니다.
 
