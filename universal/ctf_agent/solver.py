@@ -40,7 +40,7 @@ async def solve_workspace_async(
     model = model or os.getenv("CURSOR_MODEL", "composer-2.5")
     api_key = api_key or os.environ.get("CURSOR_API_KEY", "")
     if not api_key:
-        raise RuntimeError("CURSOR_API_KEY is required")
+        raise RuntimeError("CURSOR_API_KEY 환경 변수가 필요합니다.")
 
     prompt = build_solver_prompt(spec, str(workspace))
 
@@ -53,7 +53,12 @@ async def solve_workspace_async(
             run = agent.send(prompt)
             result = run.wait()
             if result.status == "error":
-                return SolveResult(False, None, result.result or "", f"run failed: {result.id}")
+                return SolveResult(
+                    False,
+                    None,
+                    result.result or "",
+                    f"솔버 실행 실패 (run ID: {result.id})",
+                )
 
             raw = result.result or ""
             flag = _parse_flag_line(raw, spec)
@@ -72,7 +77,7 @@ async def solve_workspace_async(
 
             return SolveResult(ok=bool(flag), flag=flag, raw_text=raw)
     except CursorAgentError as exc:
-        return SolveResult(False, None, "", str(exc))
+        return SolveResult(False, None, "", f"솔버 시작 실패: {exc}")
 
 
 def solve_workspace(

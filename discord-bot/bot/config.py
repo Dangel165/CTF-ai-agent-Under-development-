@@ -65,11 +65,11 @@ def load_settings() -> Settings:
 
     token = os.getenv("DISCORD_TOKEN", "").strip()
     if not token:
-        raise RuntimeError("DISCORD_TOKEN is required")
+        raise RuntimeError("DISCORD_TOKEN 환경 변수가 필요합니다.")
 
     cursor_key = os.getenv("CURSOR_API_KEY", "").strip()
     if not cursor_key:
-        raise RuntimeError("CURSOR_API_KEY is required (universal AI solver)")
+        raise RuntimeError("CURSOR_API_KEY 환경 변수가 필요합니다. (AI 솔버)")
 
     return Settings(
         discord_token=token,

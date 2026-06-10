@@ -45,7 +45,7 @@ class Category(str, Enum):
             return cls(key)
         except ValueError as exc:
             valid = ", ".join(cls.choices())
-            raise ValueError(f"Unknown category '{raw}'. Use one of: {valid}") from exc
+            raise ValueError(f"알 수 없는 분야 '{raw}'. 다음 중 하나를 사용하세요: {valid}") from exc
 
 
 @dataclass
@@ -64,14 +64,14 @@ class ChallengeSpec:
     def __post_init__(self) -> None:
         self.name = self.name.strip()
         if not self.name:
-            raise ValueError("name is required")
+            raise ValueError("문제 이름을 입력하세요.")
         if isinstance(self.category, str):
             self.category = Category.normalize(self.category)
         if not self.description.strip():
-            raise ValueError("description is required")
+            raise ValueError("문제 내용을 입력하세요.")
         self.flag_format = self.flag_format.strip()
         if not self.flag_format:
-            raise ValueError("flag_format is required (e.g. flag{...} or regex)")
+            raise ValueError("플래그 형식을 입력하세요. (예: flag{...} 또는 regex:...)")
 
     def flag_regex(self) -> re.Pattern[str]:
         """Turn user flag format into a regex pattern."""
@@ -125,7 +125,7 @@ class ChallengeSpec:
     def load_yaml(cls, path: Path) -> ChallengeSpec:
         data = yaml.safe_load(path.read_text(encoding="utf-8"))
         if not isinstance(data, dict):
-            raise ValueError(f"Invalid challenge file: {path}")
+            raise ValueError(f"올바르지 않은 challenge 파일입니다: {path}")
         return cls.from_dict(data)
 
     def save_yaml(self, path: Path) -> None:

@@ -52,6 +52,21 @@ async def _require_access(bot: CTFBot, interaction: discord.Interaction) -> bool
     return False
 
 
+def _job_list_extra(job: dict) -> str:
+    result = job.get("result") or {}
+    flag = result.get("flag")
+    if flag:
+        return f" → `{flag}`"
+    if job.get("status") == "failed":
+        err = (result.get("error") or "").strip()
+        if err:
+            line = err.split("\n", 1)[0]
+            if len(line) > 80:
+                line = line[:77] + "..."
+            return f" — ⚠ {line}"
+    return ""
+
+
 def _register_universal_commands(bot: CTFBot) -> None:
     @bot.tree.command(name="풀이", description="어떤 CTF든 — 문제 이름·분야·플래그형식·내용 입력 후 AI 풀이")
     async def solve_modal(interaction: discord.Interaction):
@@ -131,8 +146,7 @@ async def _status(bot: CTFBot, interaction: discord.Interaction, job_id: str | N
         return
     lines = ["**최근 작업**"]
     for job in recent:
-        flag = (job.get("result") or {}).get("flag")
-        extra = f" → `{flag}`" if flag else ""
+        extra = _job_list_extra(job)
         lines.append(f"- `{job['id']}` **{job.get('challenge_name')}** — `{job['status']}`{extra}")
     await interaction.followup.send("\n".join(lines)[:1900])
 

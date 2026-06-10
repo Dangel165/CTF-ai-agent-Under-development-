@@ -49,7 +49,7 @@ def load_workspace(path: Path) -> tuple[Path, ChallengeSpec]:
     path = path.resolve()
     yaml_path = path / "challenge.yaml"
     if not yaml_path.exists():
-        raise FileNotFoundError(f"No challenge.yaml in {path}")
+        raise FileNotFoundError(f"challenge.yaml이 없습니다: {path}")
     return path, ChallengeSpec.load_yaml(yaml_path)
 
 

@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import discord
 
+from ctf_agent.challenge import ChallengeSpec
+
 from bot.config import Settings
 from bot.jobs import JobStore
 
@@ -48,8 +50,6 @@ class SolveModal(discord.ui.Modal, title="CTF 문제 입력 (어떤 플랫폼이
         self.worker = worker
 
     async def on_submit(self, interaction: discord.Interaction) -> None:
-        await interaction.response.defer(ephemeral=True)
-
         platform = ""
         connection = ""
         if self.extra.value:
@@ -75,15 +75,26 @@ class SolveModal(discord.ui.Modal, title="CTF 문제 입력 (어떤 플랫폼이
             "notes": "",
         }
 
-        job_id = await self.jobs.create_solve_job(
-            challenge_name=spec["name"],
-            spec=spec,
-            requested_by=str(interaction.user.id),
-            channel_id=interaction.channel_id,  # type: ignore[arg-type]
-        )
-        await self.worker.enqueue({"id": job_id, "spec": spec, "channel_id": interaction.channel_id})
+        try:
+            ChallengeSpec.from_dict(spec)
+        except ValueError as exc:
+            await interaction.response.send_message(f"입력 오류: {exc}", ephemeral=True)
+            return
 
-        await interaction.followup.send(
-            f"**{spec['name']}** ({spec['category']}) 풀이 큐 등록\n"
-            f"Job: `{job_id}` · 플래그 형식: `{spec['flag_format']}`"
-        )
+        await interaction.response.defer(ephemeral=True)
+
+        try:
+            job_id = await self.jobs.create_solve_job(
+                challenge_name=spec["name"],
+                spec=spec,
+                requested_by=str(interaction.user.id),
+                channel_id=interaction.channel_id,  # type: ignore[arg-type]
+            )
+            await self.worker.enqueue({"id": job_id, "spec": spec, "channel_id": interaction.channel_id})
+
+            await interaction.followup.send(
+                f"**{spec['name']}** ({spec['category']}) 풀이 큐 등록\n"
+                f"Job: `{job_id}` · 플래그 형식: `{spec['flag_format']}`"
+            )
+        except Exception as exc:
+            await interaction.followup.send(f"등록 실패: {exc}", ephemeral=True)

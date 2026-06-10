@@ -21,6 +21,21 @@ ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_WORKSPACES = ROOT / "workspaces"
 
 
+def _fail(message: str) -> None:
+    console.print(f"[red]오류:[/red] {message}")
+    raise SystemExit(1)
+
+
+def _handle_errors(fn):
+    def wrapper(*args, **kwargs):
+        try:
+            return fn(*args, **kwargs)
+        except (ValueError, FileNotFoundError, RuntimeError) as exc:
+            _fail(str(exc))
+
+    return wrapper
+
+
 def _read_multiline(prompt_text: str) -> str:
     console.print(f"[bold]{prompt_text}[/bold] (finish with empty line + Ctrl-D on Unix, or Ctrl-Z+Enter on Windows)")
     lines: list[str] = []
@@ -60,6 +75,7 @@ def main(ctx: click.Context, workspaces: Path) -> None:
 @click.option("--file", "files", type=click.Path(exists=True, path_type=Path), multiple=True, help="Attachment file or folder")
 @click.option("--interactive", "-i", is_flag=True, help="Prompt for all fields interactively")
 @click.pass_context
+@_handle_errors
 def cmd_new(
     ctx: click.Context,
     from_yaml: Path | None,
@@ -118,6 +134,7 @@ def cmd_new(
 @click.option("--description", "-d", default=None)
 @click.option("--connection", default=None)
 @click.option("--platform", "-p", default=None)
+@_handle_errors
 def cmd_edit(
     workspace: Path,
     name: str | None,
@@ -148,6 +165,7 @@ def cmd_edit(
 
 @main.command("show")
 @click.argument("workspace", type=click.Path(exists=True, path_type=Path))
+@_handle_errors
 def cmd_show(workspace: Path) -> None:
     """Print challenge metadata."""
     _, spec = load_workspace(workspace)
@@ -173,6 +191,7 @@ def cmd_show(workspace: Path) -> None:
 @click.option("--platform", "-p", default="")
 @click.option("--file", "files", type=click.Path(exists=True, path_type=Path), multiple=True)
 @click.pass_context
+@_handle_errors
 def cmd_solve(
     ctx: click.Context,
     workspace: Path | None,
@@ -209,11 +228,11 @@ def cmd_solve(
     result = asyncio.run(solve_workspace_async(ws, spec))
 
     if result.error:
-        console.print(f"[red]Error:[/red] {result.error}")
+        console.print(f"[red]오류:[/red] {result.error}")
     if result.flag:
         console.print(Panel(f"[bold green]{result.flag}[/bold green]", title="Flag"))
     else:
-        console.print("[yellow]No flag extracted.[/yellow]")
+        console.print("[yellow]플래그를 찾지 못했습니다.[/yellow]")
         if result.raw_text:
             console.print(result.raw_text[-2000:])
 
