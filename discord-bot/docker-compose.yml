@@ -1,0 +1,12 @@
+services:
+  ctf-discord-bot:
+    build: .
+    restart: unless-stopped
+    env_file: .env
+    volumes:
+      - ./vendor/ctf-agent:/app/vendor/ctf-agent
+      - ./data:/app/data
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      CTF_AGENT_PATH: /app/vendor/ctf-agent
+      CHALLENGES_DIR: /app/vendor/ctf-agent/challenges

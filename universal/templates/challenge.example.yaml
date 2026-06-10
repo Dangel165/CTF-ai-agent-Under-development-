@@ -1,0 +1,12 @@
+name: "Example challenge"
+category: web
+flag_format: "flag{...}"
+platform: ""
+connection_info: ""
+
+description: |
+  Paste the full problem statement here.
+  Works on any CTF platform — not tied to CTFd or Discord.
+
+hints: []
+notes: ""

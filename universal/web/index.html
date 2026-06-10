@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CTF Agent — 문제 입력</title>
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <header>
+    <h1>CTF Agent</h1>
+    <p>어떤 CTF든 — 문제 이름 · 분야 · 플래그 형식 · 내용을 입력하면 워크스페이스를 만듭니다.</p>
+  </header>
+
+  <div class="layout">
+    <section class="panel">
+      <h2>문제 정보</h2>
+      <form id="challenge-form">
+        <label for="name">문제 이름 <span class="hint">(필수)</span></label>
+        <input type="text" id="name" name="name" placeholder="예: Easy SQL Injection" required />
+
+        <div class="row">
+          <div>
+            <label for="category">분야 <span class="hint">(필수)</span></label>
+            <select id="category" name="category" required>
+              <option value="web">web — 웹</option>
+              <option value="pwn">pwn — 바이너리</option>
+              <option value="crypto">crypto — 암호</option>
+              <option value="rev">rev — 리버싱</option>
+              <option value="forensics">forensics — 포렌식</option>
+              <option value="stego">stego — 스테가노</option>
+              <option value="osint">osint</option>
+              <option value="misc">misc — 기타</option>
+              <option value="mobile">mobile — 모바일</option>
+            </select>
+          </div>
+          <div>
+            <label for="flag_format">플래그 형식 <span class="hint">(필수)</span></label>
+            <input type="text" id="flag_format" name="flag_format" value="flag{...}" placeholder="flag{...}" required />
+          </div>
+        </div>
+
+        <label for="platform">플랫폼 <span class="hint">(선택)</span></label>
+        <input type="text" id="platform" name="platform" placeholder="HackTheBox, picoCTF, 학교CTF..." />
+
+        <label for="connection_info">연결 정보 <span class="hint">(선택)</span></label>
+        <input type="text" id="connection_info" name="connection_info" placeholder="nc host 1337 / https://..." />
+
+        <label for="description">문제 내용 <span class="hint">(필수)</span></label>
+        <textarea id="description" name="description" placeholder="문제 지문 전체를 붙여넣으세요..." required></textarea>
+
+        <label for="hints">힌트 <span class="hint">(선택, 한 줄에 하나)</span></label>
+        <textarea id="hints" name="hints" rows="3" placeholder="힌트 1&#10;힌트 2"></textarea>
+
+        <label for="notes">메모 <span class="hint">(선택)</span></label>
+        <input type="text" id="notes" name="notes" placeholder="팀 메모, 시도한 것 등" />
+
+        <label for="files">첨부 파일 <span class="hint">(선택, 여러 개 가능)</span></label>
+        <input type="file" id="files" name="files" multiple />
+        <p class="file-note">워크스페이스 생성 시 files/ 폴더에 저장됩니다.</p>
+
+        <div class="actions">
+          <button type="button" class="primary" id="btn-preview">미리보기 갱신</button>
+          <button type="button" class="success" id="btn-create">워크스페이스 생성</button>
+        </div>
+        <div id="result-path"></div>
+      </form>
+    </section>
+
+    <section class="panel">
+      <h2>출력</h2>
+      <div class="tabs">
+        <button type="button" class="tab active" data-tab="yaml">challenge.yaml</button>
+        <button type="button" class="tab" data-tab="cursor">Cursor 채팅</button>
+      </div>
+      <textarea id="output-yaml" class="mono" readonly spellcheck="false"></textarea>
+      <textarea id="output-cursor" class="mono" readonly spellcheck="false" hidden></textarea>
+
+      <div class="actions">
+        <button type="button" id="btn-copy">복사</button>
+        <button type="button" id="btn-download">YAML 다운로드</button>
+        <button type="button" id="btn-copy-cursor">Cursor 템플릿 복사</button>
+      </div>
+    </section>
+  </div>
+
+  <div id="toast"></div>
+  <script src="/app.js"></script>
+</body>
+</html>
